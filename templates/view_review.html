@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Review</title>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMaps"
+        async
+        defer>
+    </script>
+    <script>
+        function initMaps() {
+            const geocoder = new google.maps.Geocoder();
+
+            const map_div = document.getElementById('map')
+            const address = map_div.getAttribute('div_address');
+
+            geocoder.geocode({ address: address }, (results) => {
+                const location = results[0].geometry.location;
+
+                const map = new google.maps.Map(map_div, {
+                    zoom: 15,
+                    center: location
+                });
+
+                new google.maps.Marker({
+                    position: location,
+                    map: map
+                });
+            });
+        }
+    </script>
+</head>
+<body>
+  <a href="/reviews">Return to user reviews</a>
+  <h1>{{ rname }}</h1>
+  <p>Rating: {{ rating }}</p>
+  <p>Description: {{ description | safe }}</p>
+  <p>Address: {{ address }}</p>
+  <div id="map"
+       div_address="{{ address }}"
+       style="width: 75%; height: 300px; margin-top: 10px;">
+  </div>
+  <p>Timestamp: {{ timestamp }}</p>
+  <p><i>Current review state: {{ state }}</i></p>
+  <a href="/view_comments/{{ review_id }}">View comments</a>
+  <h2>Update Review</h2>
+  <form action="/update_review" method="post">
+      <input type="hidden" name="review_id" value="{{ review_id }}">
+      <label for="rname">Review name:</label>
+      <input type="text" name="rname" value="{{ rname }}">
+      <br>
+      <label for="rating">Rating:</label>
+      <input type="number" name="rating" value="{{ rating }}">
+      <br>
+      <label for="description">Description:</label>
+      <input type="text" name="description" value="{{ description }}">
+      <br>
+      <label for="address">Address:</label>
+      <input type="text" name="address" value="{{ address }}">
+      <br>
+      <label for="state">State:</label>
+      <select name="state">
+        <option value="draft">Draft</option>
+        <option value="published">Published</option>
+      </select>
+      <br>
+      <button type="submit">Update Review</button>
+  </form>
+</body>
+</html>

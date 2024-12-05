@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Details</title>
+</head>
+<body>
+  <a href="/">Return Home</a>
+  <h1>User details</h1>
+  <p>First name: <b>{{ fname }}</b></p>
+  <p>Last name: <b>{{ lname }}</b></p>
+  <p>Username: <b>{{ username }}</b></p>
+  <p>Password: <b>{{ password_ast }}</b></p>
+
+  <form action="/update_user" method="post">
+      <label for="fname">First name:</label>
+      <input type="text" name="fname" value="{{ fname }}">
+      <br>
+      <label for="lname">Last name:</label>
+      <input type="text" name="lname" value="{{ lname }}">
+      <br>
+      <label for="username">Username:</label>
+      <input type="text" name="username" value="{{ username }}">
+      <br>
+      <label for="password">Password:</label>
+      <input type="password" name="password" value="{{ password }}">
+      <br>
+      <button type="submit">Update User</button>
+  </form>
+  <a href="/delete_user">Delete User</a>
+</body>
+</html>

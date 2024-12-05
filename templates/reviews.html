@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Reviews</title>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMaps"
+        async
+        defer>
+    </script>
+    <script>
+        function initMaps() {
+            const geocoder = new google.maps.Geocoder();
+
+            document.querySelectorAll('.map_div').forEach((div) => {
+                const address = div.getAttribute('address');
+                const map_id = div.id;
+
+                geocoder.geocode({ address: address }, (results) => {
+                        const location = results[0].geometry.location;
+
+                        const map = new google.maps.Map(document.getElementById(map_id), {
+                            zoom: 15,
+                            center: location
+                        });
+
+                        new google.maps.Marker({
+                            position: location,
+                            map: map
+                        });
+                });
+            });
+        }
+    </script>
+</head>
+<body>
+<a href="/">Return Home</a>
+  <h1>{{ fname }}'s reviews</h1>
+    <br>
+    <a href="/create_review">Create review</a>
+    <br>
+    <ul>
+        {% for review in reviews %}
+            <li>
+                <p><b>{{ review.rname }}</b> Rating: {{ review.rating }}</p>
+                <p>{{ review. description | safe}}</p>
+                <p>Address: {{ review.address }}</p>
+                <div
+                    class="map_div"
+                    id="map_{{ review.review_id }}"
+                    address="{{ review.address }}"
+                    style="width: 75%; height: 300px; margin-top: 10px;">
+                </div>
+                <p>Timestamp: {{ review.timestamp }}</p>
+                <p><i>Current review state: {{ review.state }}</i></p>
+                <a href="/update_review/{{ review.review_id }}">Update review</a><br>
+                <a href="/delete_review/{{ review.review_id }}">Delete review</a>
+                <br><a href="/view_comments/{{ review.review_id }}">View comments</a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

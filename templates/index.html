@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMaps"
+        async
+        defer>
+    </script>
+    <script>
+        function initMaps() {
+            const geocoder = new google.maps.Geocoder();
+
+            document.querySelectorAll('.map_div').forEach((div) => {
+                const address = div.getAttribute('address');
+                const map_id = div.id;
+
+                geocoder.geocode({ address: address }, (results) => {
+                        const location = results[0].geometry.location;
+
+                        const map = new google.maps.Map(document.getElementById(map_id), {
+                            zoom: 15,
+                            center: location
+                        });
+
+                        new google.maps.Marker({
+                            position: location,
+                            map: map
+                        });
+                });
+            });
+        }
+    </script>
+</head>
+<body>
+  <h1>Home Page</h1>
+    <a href="/logout">Log out</a>
+    <h2>Welcome {{ fname }}</h2>
+    <a href="/user">View user details</a>
+  <br>
+    <a href="/reviews">View user reviews</a>
+  <br>
+    <a href="/create_review">Create review</a>
+    <br>
+        <ul>
+        {% for review in reviews %}
+            <li>
+                <p><b>{{ review.rname }}</b> Rating: {{ review.rating }}</p>
+                <p>User: {{ review.username }}</p>
+                <p>{{ review.description | safe}}</p>
+                <p>Address: {{ review.address }}</p>
+                <div
+                    class="map_div"
+                    id="map_{{ review.review_id }}"
+                    address="{{ review.address }}"
+                    style="width: 75%; height: 300px; margin-top: 10px;">
+                </div>
+                <p>Timestamp: {{ review.timestamp }}</p>
+                <p><i>Current review state: {{ review.state }}</i></p>
+                <!--if user is logged in, show options to delete/update their review-->
+                {% if review.user_id == session['user_id'] %}
+                    <a href="/update_review/{{ review.review_id }}">Update review</a><br>
+                    <a href="/delete_review/{{ review.review_id }}">Delete review</a><br>
+                {% endif %}
+                <a href="/view_comments/{{ review.review_id }}">View comments</a>
+            </li>
+            {% endfor %}
+    </ul>
+</body>
+</html>

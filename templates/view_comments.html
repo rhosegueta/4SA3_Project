@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Comments</title>
+  <script
+        src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMaps"
+        async
+        defer>
+    </script>
+    <script>
+        function initMaps() {
+            const geocoder = new google.maps.Geocoder();
+
+            const map_div = document.getElementById('map')
+            const address = map_div.getAttribute('div_address');
+
+            geocoder.geocode({ address: address }, (results) => {
+                const location = results[0].geometry.location;
+
+                const map = new google.maps.Map(map_div, {
+                    zoom: 15,
+                    center: location
+                });
+
+                new google.maps.Marker({
+                    position: location,
+                    map: map
+                });
+            });
+        }
+    </script>
+</head>
+<body>
+  <a href="/">Return to home page</a><br>
+  <a href="/reviews">Return to user reviews</a>
+  <h1>{{ rname }}</h1>
+  <p>Rating: {{ rating }}</p>
+  <p>Description: {{ description }}</p>
+  <p>Address: {{ address }}</p>
+  <div id="map"
+       div_address="{{ address }}"
+       style="width: 75%; height: 300px; margin-top: 10px;">
+  </div>
+  <p>Timestamp: {{ timestamp }}</p>
+  <p><i>Current review state: {{ state }}</i></p>
+  <br>
+  <h1>Comments</h1>
+  <h2>Write a comment:</h2>
+  <form action="/create_comment" method="post">
+      <input type="hidden" name="review_id" value="{{ review_id }}">
+      <label for="content">Content:</label>
+      <input type="text" name="content">
+      <br>
+      <button type="submit">Save</button>
+  </form>
+  <br>
+  <ul>
+        {% for comment in comments %}
+            <li>
+                <p><b>{{ comment.username }}:</b></p>
+                <p><i>Timestamp: {{ comment.timestamp }}</i></p>
+                <p>{{ comment.content | safe}}</p>
+                <!--if user is logged in, show options to delete/update their comments-->
+                {% if comment.user_id == session['user_id'] %}
+                    <p><b>Update comment:</b></p>
+                    <form action="/update_comment" method="post">
+                        <input type="hidden" name="review_id" value="{{ review_id }}">
+                        <input type="hidden" name="comment_id" value="{{ comment.comment_id }}">
+                        <label for="content">Content:</label>
+                        <input type="text" name="content">
+                        <button type="submit">Update</button>
+                    </form>
+                    <a href="/delete_comment/{{ review_id }}/{{ comment.comment_id }}">Delete comment</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
